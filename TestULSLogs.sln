@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1062
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestULSLogs", "TestULSLogs\TestULSLogs.csproj", "{06641803-C1DA-4FEC-841A-300EEC154F58}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{06641803-C1DA-4FEC-841A-300EEC154F58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06641803-C1DA-4FEC-841A-300EEC154F58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06641803-C1DA-4FEC-841A-300EEC154F58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06641803-C1DA-4FEC-841A-300EEC154F58}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B961CC82-7E72-4EC9-AEB2-7607BD970298}
+	EndGlobalSection
+EndGlobal
