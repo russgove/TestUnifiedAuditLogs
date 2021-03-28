@@ -106,21 +106,21 @@ namespace TestULSLogs
                 string token;
                 token = await GetToken(config);
                 HttpClient client = new HttpClient();
-                var wh = new
+                var webhook = new
                 {
                     webhook = new WebHook()
                     {
-                        address = "https://e3d4c33c0601.ngrok.io/api/Callback",
-                        authId = "o365activityapinotification",
+                        address = "https://e3d4c33c0601.ngrok.io/api/Callback", //TODO: make this come from Http request (from a management webpart?)
+                        authId = "o365activityapinotification",//TODO: make this come from Http request
                         expiration = ""
                     }
                 };
 
-                var xx = JsonSerializer.Serialize(wh);
+                var xx = JsonSerializer.Serialize(webhook);
                 client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
                 client.DefaultRequestHeaders.Add("Accept", "application/json;odata=verbose");
                 var Uri = new Uri($"{config["ResourceURL"]}/api/v1.0/{config["TenantId"]}/activity/feed/subscriptions/start?contentType=Audit.SharePoint&PublisherIdentifier={config["TenantId"]}`");
-                var response = await client.PostAsync(Uri, new StringContent(JsonSerializer.Serialize(wh), Encoding.UTF8, "application/json"));
+                var response = await client.PostAsync(Uri, new StringContent(JsonSerializer.Serialize(webhook), Encoding.UTF8, "application/json"));
                 Console.WriteLine(response.RequestMessage);
                 Console.WriteLine(response.Content.ToString());
 
@@ -134,6 +134,12 @@ namespace TestULSLogs
 
             return new OkObjectResult("OK");
         }
+        /// <summary>
+        ///  This is not currently used , but could be used by a management webpart
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="log"></param>
+        /// <returns></returns>
         [FunctionName("ListAvailableContent")]
         public static async Task<IActionResult> ListAvailableContent(
 [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
@@ -176,7 +182,12 @@ ILogger log)
 
         }
 
-
+        /// <summary>
+        ///  after we register our subscription M365 will call this function when new content is available.
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="log"></param>
+        /// <returns></returns>
         [FunctionName("Callback")]
         public static IActionResult Callback(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
