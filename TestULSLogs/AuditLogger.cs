@@ -5,13 +5,10 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Azure.Core;
-using Azure.Core.Diagnostics;
-using Azure.Identity;
-using Azure.Storage.Blobs;
+
 using Microsoft.Extensions.Configuration;
 using System.IO;
-using System.Collections.Generic;
+
 using System.Text.Json;
 
 
@@ -19,18 +16,22 @@ using System.Net;
 using System.Collections.Specialized;
 using System.Text;
 using System.Net.Http;
-using System.Security.Claims;
+
 
 namespace TestULSLogs
 {
-
+    /// <summary>
+    /// This is an item we send to M365 to request a subscription be added to the audit logs
+    /// </summary>
     public class WebHook
     {
         public string address { get; set; }
         public string authId { get; set; }
         public string expiration { get; set; }
     }
-
+    /// <summary>
+    /// This represents the details of an Audit item
+    /// </summary>
     public class AuditItem
     {
         public string CreationTime { get; set; }
@@ -71,7 +72,10 @@ namespace TestULSLogs
 
     }
 
-
+    /// <summary>
+    /// This represents  the data sent back to  our callback when new Audit content is available. The callback
+    /// recives an array of these.
+    /// </summary>
     public class CallbackItem
     {
         public string clientId { get; set; }
@@ -83,7 +87,7 @@ namespace TestULSLogs
         public string contentUri { get; set; }
         public string tenantId { get; set; }
     }
-    public static class GetStorageContainers
+    public static class AuditLogger
     {
 
         [FunctionName("StartSubscription")]
@@ -237,13 +241,7 @@ ILogger log)
                return JsonSerializer.Deserialize<CallbackItem[]>(body);
                
               }
-        public static string GetResponseBody(HttpRequest request)
-        {
-            var stream = new StreamReader(request.Body);
-            var body = stream.ReadToEnd();
-            return body;
 
-        }
         public static string GetRequestBody(HttpRequest request)
         {
             var stream = new StreamReader(request.Body);
