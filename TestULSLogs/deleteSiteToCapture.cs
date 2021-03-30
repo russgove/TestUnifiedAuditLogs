@@ -19,11 +19,11 @@ namespace TestULSLogs
         {
             log.LogInformation("DeleteSiteToCapture Started");
 
-            string siteUrl = req.Query["siteUrl"];
-            if (String.IsNullOrEmpty(siteUrl)){
+            string siteId = req.Query["siteId"];
+            if (String.IsNullOrEmpty(siteId)){
                 return new BadRequestResult();
             }
-            var siteToCapture=Utilities.retrieveSiteToCapture(siteUrl);
+            var siteToCapture=Utilities.retrieveSiteToCapture(siteId);
             if (siteToCapture == null)
             {
                 return new NotFoundResult();

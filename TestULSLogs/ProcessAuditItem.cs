@@ -25,7 +25,8 @@ namespace TestULSLogs
         {
             log.LogInformation($"ProcessAuditItem Started");
             Model.AuditItem auditItem = JsonSerializer.Deserialize<Model.AuditItem>(myQueueItem);
-            Console.WriteLine($"User {auditItem.UserId} {auditItem.Operation} {auditItem.ItemType} {auditItem.SourceFileName}  in {auditItem.SourceRelativeUrl} on {auditItem.SiteUrl}");
+            Utilities.ProcessAuditItem(auditItem);
+            
         }
     }
 }

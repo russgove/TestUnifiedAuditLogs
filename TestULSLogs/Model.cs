@@ -16,7 +16,7 @@ namespace TestULSLogs
             public SiteToCaptureEntity(string siteUrl,string siteId ,string eventsToCapture, string captureToListUrl)
             {
                 this.PartitionKey = "";
-                this.RowKey = siteUrl;
+                this.RowKey = siteId;
                 this.SiteUrl = siteUrl;
                 this.SiteId = siteId;
                 this.EventsToCapture = eventsToCapture;

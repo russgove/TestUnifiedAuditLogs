@@ -19,6 +19,12 @@ namespace TestULSLogs
 {
     public static class Utilities
     {
+        public static async void ProcessAuditItem(Model.AuditItem auditItem)
+        {
+            var config = GetConfig();
+            Console.WriteLine($"User {auditItem.UserId} {auditItem.Operation} {auditItem.ItemType} {auditItem.SourceFileName}  in {auditItem.SourceRelativeUrl} on {auditItem.SiteUrl}");
+        }
+
         public static async void addSiteToCapture(string siteUrl,string siteId, string eventsToCapture, string captureToListUrl)
         {
             var config = GetConfig();
@@ -31,14 +37,14 @@ namespace TestULSLogs
             TableResult result = await table.ExecuteAsync(insertOrMergeOperation);
             Model.SiteToCaptureEntity insertedCustomer = result.Result as Model.SiteToCaptureEntity;
         }
-        public static  Model.SiteToCaptureEntity retrieveSiteToCapture(string siteUrl)
+        public static  Model.SiteToCaptureEntity retrieveSiteToCapture(string siteId)
         {
             var config = GetConfig();
             var storageAccount = CloudStorageAccount.Parse(config["StorageAccountConnectionString"]);
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
             CloudTable table = tableClient.GetTableReference(config["SitesToCaptureTable"]);
 
-            TableOperation retrieveOperation = TableOperation.Retrieve<Model.SiteToCaptureEntity>("",siteUrl);
+            TableOperation retrieveOperation = TableOperation.Retrieve<Model.SiteToCaptureEntity>("", siteId);
             TableResult result = table.Execute(retrieveOperation);
             Model.SiteToCaptureEntity siteToCapture = result.Result as Model.SiteToCaptureEntity;
             return siteToCapture;
