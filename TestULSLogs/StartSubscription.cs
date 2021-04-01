@@ -23,12 +23,14 @@ namespace TestULSLogs
     {
         [FunctionName("StartSubscription")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("StartSubscription Started");
-
-            var subs = await Utilities.StartSubscription();
+            string address = req.Query["address"];
+            string authId = req.Query["authId"];
+            string expiration = req.Query["expiration"];
+            var subs = await Utilities.StartSubscription(address,authId, expiration);
 
             return new OkObjectResult(subs);
         }

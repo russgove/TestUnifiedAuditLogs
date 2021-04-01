@@ -14,6 +14,9 @@ using System.Net.Http;
 using Microsoft.Azure.Cosmos.Table;
 using System.Collections.Generic;
 using System.Web;
+using Microsoft.Graph;
+using Microsoft.Identity.Client;
+using Microsoft.Graph.Auth;
 
 namespace TestULSLogs
 {
@@ -23,16 +26,29 @@ namespace TestULSLogs
         {
             var config = GetConfig();
             Console.WriteLine($"User {auditItem.UserId} {auditItem.Operation} {auditItem.ItemType} {auditItem.SourceFileName}  in {auditItem.SourceRelativeUrl} on {auditItem.SiteUrl}");
+            var stc = retrieveSiteToCapture(auditItem.Site);
+            IConfidentialClientApplication confidentialClientApplication = ConfidentialClientApplicationBuilder
+    .Create(config["ClientId"])
+    .WithTenantId(config["TenantID"])
+    .WithClientSecret(config["ClientSecret"])
+    .Build();
+
+ClientCredentialProvider authProvider = new ClientCredentialProvider(confidentialClientApplication);
+            GraphServiceClient graphClient = new GraphServiceClient(authProvider);
+
+            var site = await graphClient.Sites["049287e5-abd9-472d-828b-a0a591ca2421"]
+                .Request()
+                .GetAsync();
         }
 
-        public static async void addSiteToCapture(string siteUrl,string siteId, string eventsToCapture, string captureToListUrl)
+        public static async void addSiteToCapture(string siteUrl,string siteId, string eventsToCapture, string captureToSiteId, string captureToListId)
         {
             var config = GetConfig();
             var storageAccount = CloudStorageAccount.Parse(config["StorageAccountConnectionString"]);
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
             CloudTable table = tableClient.GetTableReference(config["SitesToCaptureTable"]);
 
-            var entity = new Model.SiteToCaptureEntity(HttpUtility.UrlEncode(siteUrl), siteId,eventsToCapture, captureToListUrl);
+            var entity = new Model.SiteToCaptureEntity(HttpUtility.UrlEncode(siteUrl), siteId,eventsToCapture, captureToSiteId, captureToListId);
             TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(entity);
             TableResult result = await table.ExecuteAsync(insertOrMergeOperation);
             Model.SiteToCaptureEntity insertedCustomer = result.Result as Model.SiteToCaptureEntity;
@@ -118,7 +134,7 @@ namespace TestULSLogs
             return availableContent;
 
         }
-        public static async Task<string> StartSubscription()
+        public static async Task<string> StartSubscription(string address,string authId,string expiration)
         {
             var config = GetConfig();
             var client = await GetHttpClient(config);
@@ -126,9 +142,9 @@ namespace TestULSLogs
             {
                 webhook = new Model.WebHook()
                 {
-                    address = "https://1b61829ba29f.ngrok.io/api/Callback", //TODO: make this come from Http request (from a management webpart?)
-                    authId = "o365activityapinotification",//TODO: make this come from Http request
-                    expiration = ""
+                    address = address, 
+                    authId = authId,
+                    expiration = expiration
                 }
             };
 
@@ -136,13 +152,14 @@ namespace TestULSLogs
 
             var Uri = new Uri($"{config["ResourceURL"]}/api/v1.0/{config["TenantId"]}/activity/feed/subscriptions/start?contentType=Audit.SharePoint&PublisherIdentifier={config["TenantId"]}`");
             var response = await client.PostAsync(Uri, new StringContent(JsonSerializer.Serialize(webhook), Encoding.UTF8, "application/json"));
-            response.EnsureSuccessStatusCode();
-            Console.WriteLine(response.Content);
-            Console.WriteLine(response.Content.ToString());
+           // response.EnsureSuccessStatusCode();
+
+            var message = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(message);
 
 
-            Console.WriteLine(response);
-            return ":";
+           
+            return message;
 
         }
         #region queueops
@@ -167,7 +184,7 @@ namespace TestULSLogs
         public static IConfigurationRoot GetConfig()
         {
             var config = new ConfigurationBuilder()
-               .SetBasePath(Directory.GetCurrentDirectory())
+               .SetBasePath(System.IO.Directory.GetCurrentDirectory())
                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                .AddEnvironmentVariables()
                .Build();
@@ -190,9 +207,9 @@ namespace TestULSLogs
             {
                 var requestParameters = new NameValueCollection();
                 requestParameters.Add("resource", config["ResourceURL"]);
-                requestParameters.Add("client_id", "4588cb8c-24a8-43ab-bccb-15e7c3ae2030");
+                requestParameters.Add("client_id", config["clientId"]);
                 requestParameters.Add("grant_type", "client_credentials");
-                requestParameters.Add("client_secret", "B1Q~2VY50qSjS7O8-.0UK.gPGXm0I8kbpq");
+                requestParameters.Add("client_secret", config["clientSecret"]);
 
                 var url = $"https://login.microsoftonline.com/{config["TenantId"]}/oauth2/token";
                 webClient.Headers.Add("Content-Type", "application/x-www-form-urlencoded");

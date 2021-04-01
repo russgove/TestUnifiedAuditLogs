@@ -14,7 +14,7 @@ namespace TestULSLogs
     {
         [FunctionName("AddSiteToCapture")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("AddSiteToCapture Started");
@@ -22,12 +22,16 @@ namespace TestULSLogs
             string siteUrl = req.Query["siteUrl"];
             string siteId = req.Query["siteId"];
             string eventsToCapture = req.Query["eventsToCapture"];
-            string captureToListUrl = req.Query["captureToListUrl"];
+            string captureToListId = req.Query["captureToListId"];
+            string captureToSiteId = req.Query["captureToSiteId"];
 
-            if (String.IsNullOrEmpty(siteUrl) | String.IsNullOrEmpty(eventsToCapture) | String.IsNullOrEmpty(captureToListUrl))
+            if (String.IsNullOrEmpty(siteUrl) |
+                String.IsNullOrEmpty(eventsToCapture) |
+                String.IsNullOrEmpty(captureToListId) |
+                String.IsNullOrEmpty(captureToSiteId))
             { return new BadRequestResult(); }
 
-            Utilities.addSiteToCapture(siteUrl, siteId,eventsToCapture, captureToListUrl);
+            Utilities.addSiteToCapture(siteUrl, siteId,eventsToCapture, captureToSiteId, captureToListId);
 
             return new OkObjectResult("OK");
         }

@@ -13,18 +13,20 @@ namespace TestULSLogs
             {
             }
 
-            public SiteToCaptureEntity(string siteUrl,string siteId ,string eventsToCapture, string captureToListUrl)
+            public SiteToCaptureEntity(string siteUrl,string siteId ,string eventsToCapture, string captureToSiteId, string captureToListId)
             {
                 this.PartitionKey = "";
                 this.RowKey = siteId;
                 this.SiteUrl = siteUrl;
                 this.SiteId = siteId;
                 this.EventsToCapture = eventsToCapture;
-                this.CaptureToListUrl = eventsToCapture;
+                this.CaptureToSiteId = captureToSiteId;
+                this.CaptureToListId = captureToListId;
             }
             public string SiteUrl  { get; set; }
             public string SiteId { get; set; }
-            public string CaptureToListUrl { get; set; }
+            public string CaptureToSiteId { get; set; }
+            public string CaptureToListId { get; set; }
             public string EventsToCapture { get; set; }
         }
         public class CallbackItem
